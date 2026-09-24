@@ -1233,4 +1233,13 @@ config XILINX_XADC
 	  The driver can also be build as a module. If so, the module will be called
 	  xilinx-xadc.
 
+config ADS1299_MYBOARD
+	tristate "TI ADS1299 MyBoard two-channel acquisition"
+	depends on SPI && GPIOLIB
+	select IIO_BUFFER
+	select IIO_TRIGGERED_BUFFER
+	help
+	  ADS1299 using DRDY-triggered SPI reads. Fixed reference-board
+	  configuration: CH1/CH2, 500 SPS, PGA 24, internal 4.5 V reference.
+
 endmenu

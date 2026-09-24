@@ -1477,3 +1477,6 @@ dtb-$(CONFIG_ARCH_ASPEED) += \
 	aspeed-bmc-opp-zaius.dtb \
 	aspeed-bmc-portwell-neptune.dtb \
 	aspeed-bmc-quanta-q71l.dtb
+
+# ADS1299 MyBoard integration
+dtb-$(CONFIG_ARCH_ROCKCHIP) += rv1106g-luckfox-pico-zero-myboard.dtb
