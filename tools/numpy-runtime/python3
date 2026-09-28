@@ -1,0 +1,12 @@
+#!/bin/sh
+# Keep this environment process-local; system Python remains unchanged.
+RUNTIME=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd) || exit 1
+unset PYTHONPATH PYTHONSTARTUP LD_PRELOAD LD_LIBRARY_PATH
+export PYTHONHOME="$RUNTIME/usr"
+export PYTHONNOUSERSITE=1
+export PYTHONDONTWRITEBYTECODE=1
+export OPENBLAS_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+exec "$RUNTIME/lib/ld-musl-armhf.so.1" \
+    --library-path "$RUNTIME/lib:$RUNTIME/usr/lib" \
+    "$RUNTIME/usr/bin/python3.12" "$@"
