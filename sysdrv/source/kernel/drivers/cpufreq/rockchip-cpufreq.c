@@ -859,6 +859,7 @@ static int rockchip_cpufreq_idle_state_disable(struct cpumask *cpumask,
 		cpuidle_driver_state_disabled(drv, index, disable);
 	}
 
+#ifdef CONFIG_SMP
 	if (disable) {
 		preempt_disable();
 		for_each_cpu(cpu, cpumask) {
@@ -867,6 +868,7 @@ static int rockchip_cpufreq_idle_state_disable(struct cpumask *cpumask,
 		}
 		preempt_enable();
 	}
+#endif
 
 	return 0;
 }

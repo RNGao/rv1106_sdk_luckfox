@@ -14,7 +14,7 @@
 	ads1299: adc@0 {
 		compatible = "ti,ads1299";
 		reg = <0>;
-		spi-max-frequency = <1000000>;
+		spi-max-frequency = <4000000>;
 		spi-cpha;
 		pinctrl-names = "default";
 		pinctrl-0 = <&ads1299_control &ads1299_drdy>;

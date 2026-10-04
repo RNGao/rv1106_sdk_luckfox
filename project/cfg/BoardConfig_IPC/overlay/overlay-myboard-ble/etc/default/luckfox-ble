@@ -1,0 +1,7 @@
+# Pico Zero onboard antenna; use 0 only when an external antenna is attached.
+ANTENNA_VALUE=1
+# Keep the UTF-8 encoded name within 18 bytes.
+BLE_NAME=Luckfox-BLE
+# 0.625 ms units: 160..240 = 100..150 ms.
+ADV_MIN=160
+ADV_MAX=240

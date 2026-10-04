@@ -120,13 +120,13 @@ export LF_WIFI_PSK="Your wifi password"
 #################################################
 
 # specify pre.sh for delete/overlay files
-export RK_PRE_BUILD_OEM_SCRIPT=luckfox-buildroot-oem-pre.sh
+export RK_PRE_BUILD_OEM_SCRIPT=luckfox-myboard-oem-pre.sh
 
 # specify post.sh for delete/overlay files
 export RK_PRE_BUILD_USERDATA_SCRIPT=luckfox-userdata-pre.sh
 
 # declare overlay directory
-export RK_POST_OVERLAY="overlay-luckfox-config overlay-luckfox-buildroot-init overlay-luckfox-buildroot-shadow"
+export RK_POST_OVERLAY="overlay-luckfox-config overlay-luckfox-buildroot-init overlay-luckfox-buildroot-shadow overlay-myboard-ble"
 
 # ADS1299 MyBoard integration
 export RK_KERNEL_DEFCONFIG_FRAGMENT="$RK_KERNEL_DEFCONFIG_FRAGMENT ads1299-myboard.config"
