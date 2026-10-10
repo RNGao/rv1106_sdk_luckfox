@@ -1,37 +1,31 @@
 # MyBoard startup
 
+BLE/WiFi 驱动、板上路径、启动顺序和 PREEMPT 构建记录见
+[BLE_WIFI_PREEMPT.md](BLE_WIFI_PREEMPT.md)。
+
 The MyBoard OEM packaging hook installs the acquisition startup scripts and
 the Buildroot-built `btmgmt` tool. Camera/video modules and `rkipc` are not
 started. Wi-Fi/Bluetooth initialization and the existing audio path remain.
+The MyBoard Wi-Fi loader uses the AIC8800DC modules. If the first SDIO probe
+fails, it resets only the Wi-Fi SDIO host and retries once. `S99hciinit` waits
+for `wlan0` before attaching the Bluetooth UART controller.
 
-The board-specific `overlay-myboard-ble` installs `/etc/init.d/S99zble`, which
-runs after `S99hciinit`. It selects the Pico Zero onboard antenna (GPIO123,
-GPIO3_D3 = 1), waits up to 30 seconds for the Bluetooth controller, and starts
-one connectable, indefinitely advertising `Luckfox-BLE` instance. The name is
-in the advertising packet rather than depending on a scan response.
+`S99hciinit` brings up `hci0` at boot. `S99zble` no longer starts advertising;
+the BLE GATT test program owns advertising when run manually:
 
 ```sh
-/etc/init.d/S99zble status
-/etc/init.d/S99zble stop
-/etc/init.d/S99zble start
-/etc/init.d/S99zble restart
+/ble_test/ble_test --self-test-restart
+/ble_test/ble_test
 ```
 
-Settings are in `/etc/default/luckfox-ble`. The default 100–150 ms interval is
-applied through kernel debugfs because this SDK does not apply the interval
-requested by `bluetoothctl`. These GPIO mappings are for the original Pico
-Zero, not arbitrary RV1106 boards.
+Source and test instructions are in `tools/ble-test/README.md`. The test
+program accepts Write, sends Notify, logs connections and disconnects, and
+restarts advertising after a disconnect. It is not yet the nRF application's
+data protocol.
 
-This script owns advertising on hci0: start/stop clears existing advertising
-instances, so do not also run a bluetoothctl advertiser. Bluetooth remains
-powered when advertising is stopped. A fresh four-byte development nonce
-in manufacturer data forces the old kernel to resend the payload on restart;
-the total payload remains within the legacy 31-byte limit.
-
-This is boot-time advertising, not a GATT data service or a connection
-supervisor. ADS1299 data transfer and reconnect behavior require a GATT
-application. The script does not pair with phones or change authentication.
-
-Run `./build.sh firmware` to include the changes. Both `rootfs.img` (init and
-configuration) and `oem.img` (btmgmt) are required, or use the resulting full
-`update.img`. Existing boot images must include Bluetooth and DEBUG_FS.
+Run `./build.sh driver` after changing the kernel PREEMPT setting, then run
+`./build.sh firmware`. The OEM packaging hook rejects Wi-Fi/Bluetooth modules
+whose version magic does not match PREEMPT. Both `rootfs.img` (init and
+configuration) and `oem.img` (modules and btmgmt) are required, or use the
+resulting full `update.img`. Existing boot images must include Bluetooth and
+DEBUG_FS.

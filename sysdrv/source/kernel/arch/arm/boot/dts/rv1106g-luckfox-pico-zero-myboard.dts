@@ -5,6 +5,17 @@
 	model = "Luckfox Pico Zero MyBoard (ADS1299)";
 };
 
+&leds {
+	pinctrl-names = "default";
+	pinctrl-0 = <&led_gpio1_c6>;
+
+	led-gpio1-c6 {
+		label = "gpio1-c6";
+		gpios = <&gpio1 RK_PC6 GPIO_ACTIVE_HIGH>;
+		default-state = "off";
+	};
+};
+
 &spi0 {
 	status = "okay";
 	pinctrl-names = "default";
@@ -26,6 +37,12 @@
 };
 
 &pinctrl {
+	leds {
+		led_gpio1_c6: led-gpio1-c6 {
+			rockchip,pins = <1 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
 	ads1299 {
 		ads1299_control: ads1299-control {
 			rockchip,pins = <1 RK_PD1 RK_FUNC_GPIO &pcfg_pull_none>,

@@ -1,0 +1,48 @@
+#!/bin/sh
+
+select_onboard_antenna() {
+    # GPIO3_D3 (gpio123) selects the Pico Zero's onboard Wi-Fi/Bluetooth antenna.
+    gpio=/sys/class/gpio/gpio123
+    if [ ! -d "$gpio" ]; then
+        echo 123 > /sys/class/gpio/export || return 1
+    fi
+    echo high > "$gpio/direction" || return 1
+}
+
+start_hci() {
+    select_onboard_antenna || {
+        echo "[BLE] Failed to select onboard antenna on GPIO3_D3" >&2
+        return 1
+    }
+
+    tries=0
+    while [ ! -d /sys/class/net/wlan0 ]; do
+        tries=$((tries + 1))
+        [ "$tries" -lt 30 ] || {
+            echo "[BLE] AIC8800 WiFi driver did not start" >&2
+            return 1
+        }
+        sleep 1
+    done
+
+    if [ ! -d /sys/class/bluetooth/hci0 ]; then
+        hciattach -s 1500000 /dev/ttyS1 any 1500000 flow nosleep \
+            >/run/hciattach.log 2>&1 &
+    fi
+
+    tries=0
+    while [ ! -d /sys/class/bluetooth/hci0 ]; do
+        tries=$((tries + 1))
+        [ "$tries" -lt 15 ] || {
+            echo "[BLE] HCI controller did not appear" >&2
+            return 1
+        }
+        sleep 1
+    done
+    hciconfig hci0 up
+}
+
+case "${1:-}" in
+    start) start_hci & ;;
+    *) exit 1 ;;
+esac

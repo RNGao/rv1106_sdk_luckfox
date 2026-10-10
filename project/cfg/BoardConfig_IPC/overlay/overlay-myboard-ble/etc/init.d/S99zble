@@ -1,100 +1,20 @@
 #!/bin/sh
-# Pico Zero: onboard antenna and one connectable BLE advertising instance.
-# This script owns the controller's advertising instances. Do not run a
-# separate bluetoothctl advertiser at the same time.
-
-export LC_ALL=C
-PATH=/usr/sbin:/usr/bin:/sbin:/bin
-BTMGMT=/oem/usr/bin/btmgmt
-BLE_NAME=Luckfox-BLE
-# GPIO3_D3: 1 = onboard antenna, 0 = external antenna on Pico Zero.
-ANTENNA_GPIO=123
-ANTENNA_VALUE=1
-# Kernel units are 0.625 ms: 160..240 means 100..150 ms.
-ADV_MIN=160
-ADV_MAX=240
-STATE=/run/luckfox-ble-advertising
-
-[ ! -r /etc/default/luckfox-ble ] || . /etc/default/luckfox-ble
-
-fail() {
-    echo "[BLE] $*" >&2
-    exit 1
-}
-
-clear_advertising() {
-    # This kernel rejects Remove Advertising when no instances exist.
-    adv_info=$("$BTMGMT" advinfo) || return 1
-    case "$adv_info" in
-        *"Instances list with 0 items"*) return 0 ;;
-    esac
-    "$BTMGMT" clr-adv
-}
-
-start_ble() {
-    [ -x "$BTMGMT" ] || fail "Missing $BTMGMT"
-    name_len=${#BLE_NAME}
-    [ "$name_len" -ge 1 ] && [ "$name_len" -le 18 ] ||
-        fail "BLE_NAME must contain 1..18 bytes"
-    case "$ANTENNA_VALUE" in
-        0) antenna_direction=low ;;
-        1) antenna_direction=high ;;
-        *) fail "ANTENNA_VALUE must be 0 or 1" ;;
-    esac
-
-    gpio_dir=/sys/class/gpio/gpio$ANTENNA_GPIO
-    if [ ! -d "$gpio_dir" ]; then
-        echo "$ANTENNA_GPIO" > /sys/class/gpio/export || fail "Cannot export antenna GPIO"
-    fi
-    echo "$antenna_direction" > "$gpio_dir/direction" || fail "Cannot select antenna"
-
-    # S99hciinit starts asynchronously; wait for it rather than starting a
-    # second hciattach or resetting the controller used by BlueZ.
-    tries=0
-    until "$BTMGMT" info 2>/dev/null | grep -q 'current settings:.*powered'; do
-        tries=$((tries + 1))
-        [ "$tries" -lt 30 ] || fail "Bluetooth controller not ready after 30 seconds"
-        sleep 1
-    done
-
-    if ! grep -q ' /sys/kernel/debug debugfs ' /proc/mounts; then
-        mount -t debugfs debugfs /sys/kernel/debug || fail "Cannot mount debugfs"
-    fi
-    adv_dir=/sys/kernel/debug/bluetooth/hci0
-    echo "$ADV_MIN" > "$adv_dir/adv_min_interval" || fail "Cannot set advertising interval"
-    echo "$ADV_MAX" > "$adv_dir/adv_max_interval" || fail "Cannot set advertising interval"
-
-    name_hex=$(printf '%s' "$BLE_NAME" | od -An -v -tx1 | tr -d ' \n')
-    name_ad_len=$(printf '%02x' "$((name_len + 1))")
-    # A new test manufacturer-data nonce forces this SDK's global advertising
-    # cache to resend the data after an instance has been removed/recreated.
-    # 0xffff is used only for this development payload, not a product identity.
-    nonce=$(od -An -N4 -tx1 /dev/urandom | tr -d ' \n')
-    [ "${#nonce}" -eq 8 ] || fail "Cannot generate advertising nonce"
-    payload="${name_ad_len}09${name_hex}07ffffff${nonce}"
-
-    clear_advertising || fail "Cannot clear previous advertising instance"
-    rm -f "$STATE"
-    "$BTMGMT" add-adv -c -g -t 0 -d "$payload" 1 || fail "Cannot start advertising"
-    printf '%s\n' "$BLE_NAME" > "$STATE"
-    echo "[BLE] Advertising $BLE_NAME (no timeout, antenna GPIO=$ANTENNA_VALUE)"
-}
+# BLE advertising is owned by the manually started /ble_test/ble_test program.
+# Keep this init entry inert so existing firmware overlays cannot advertise at
+# boot or compete with the GATT test server.
 
 case "${1:-}" in
-    start|restart)
-        start_ble
+    start)
+        echo "[BLE] Boot advertising disabled; run /ble_test/ble_test manually"
         ;;
     stop)
-        clear_advertising || fail "Cannot stop advertising"
-        rm -f "$STATE"
-        echo "[BLE] Advertising stopped; antenna and Bluetooth controller kept enabled"
+        echo "[BLE] Advertising is controlled by /ble_test/ble_test"
         ;;
     status)
-        [ ! -f "$STATE" ] || cat "$STATE"
-        "$BTMGMT" advinfo
+        /oem/usr/bin/btmgmt advinfo
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|status}" >&2
+        echo "Usage: $0 {start|stop|status}" >&2
         exit 1
         ;;
 esac

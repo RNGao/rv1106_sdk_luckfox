@@ -121,6 +121,7 @@ export LF_WIFI_PSK="Your wifi password"
 
 # specify pre.sh for delete/overlay files
 export RK_PRE_BUILD_OEM_SCRIPT=luckfox-myboard-oem-pre.sh
+export RK_POST_BUILD_SCRIPT=luckfox-myboard-post.sh
 
 # specify post.sh for delete/overlay files
 export RK_PRE_BUILD_USERDATA_SCRIPT=luckfox-userdata-pre.sh
