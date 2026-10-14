@@ -3,15 +3,42 @@
 
 / {
 	model = "Luckfox Pico Zero MyBoard (ADS1299)";
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&keys_pins>;
+
+		key-gpio1-c7 {
+			label = "gpio1-c7";
+			gpios = <&gpio1 RK_PC7 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_1>;
+			debounce-interval = <20>;
+		};
+
+		key-gpio0-a3 {
+			label = "gpio0-a3";
+			gpios = <&gpio0 RK_PA3 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_2>;
+			debounce-interval = <20>;
+		};
+
+		key-gpio0-a4 {
+			label = "gpio0-a4";
+			gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_3>;
+			debounce-interval = <20>;
+		};
+	};
 };
 
 &leds {
 	pinctrl-names = "default";
-	pinctrl-0 = <&led_gpio1_c6>;
+	pinctrl-0 = <&led_gpio0_a0>;
 
-	led-gpio1-c6 {
-		label = "gpio1-c6";
-		gpios = <&gpio1 RK_PC6 GPIO_ACTIVE_HIGH>;
+	led-gpio0-a0 {
+		label = "gpio0-a0";
+		gpios = <&gpio0 RK_PA0 GPIO_ACTIVE_HIGH>;
 		default-state = "off";
 	};
 };
@@ -48,14 +75,22 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&icm20948_int>;
 		interrupt-parent = <&gpio1>;
-		interrupts = <RK_PD3 IRQ_TYPE_EDGE_FALLING>;
+		interrupts = <RK_PC6 IRQ_TYPE_EDGE_FALLING>;
 	};
 };
 
 &pinctrl {
+	keys {
+		keys_pins: keys-pins {
+			rockchip,pins = <1 RK_PC7 RK_FUNC_GPIO &pcfg_pull_up>,
+				       <0 RK_PA3 RK_FUNC_GPIO &pcfg_pull_up>,
+				       <0 RK_PA4 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+	};
+
 	leds {
-		led_gpio1_c6: led-gpio1-c6 {
-			rockchip,pins = <1 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none>;
+		led_gpio0_a0: led-gpio0-a0 {
+			rockchip,pins = <0 RK_PA0 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
@@ -72,7 +107,7 @@
 
 	icm20948 {
 		icm20948_int: icm20948-int {
-			rockchip,pins = <1 RK_PD3 RK_FUNC_GPIO &pcfg_pull_up>;
+			rockchip,pins = <1 RK_PC6 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 };
