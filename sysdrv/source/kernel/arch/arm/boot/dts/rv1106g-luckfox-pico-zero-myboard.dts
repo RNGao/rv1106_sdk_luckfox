@@ -32,6 +32,21 @@
 	};
 };
 
+/* The schematic connects VDD_ARM to the fixed VDD_0V9 rail through R70. */
+&vdd_arm {
+	regulator-min-microvolt = <900000>;
+	regulator-max-microvolt = <900000>;
+};
+
+/* Keep automatic scaling within the board's existing 1.104 GHz ceiling. */
+&cpu0_opp_table {
+	/delete-node/ opp-1200000000;
+	/delete-node/ opp-1296000000;
+	/delete-node/ opp-1416000000;
+	/delete-node/ opp-1512000000;
+	/delete-node/ opp-1608000000;
+};
+
 &leds {
 	pinctrl-names = "default";
 	pinctrl-0 = <&led_gpio0_a0>;
