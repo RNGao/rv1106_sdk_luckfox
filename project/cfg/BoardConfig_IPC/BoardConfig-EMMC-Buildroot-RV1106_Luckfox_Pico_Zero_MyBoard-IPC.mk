@@ -131,3 +131,4 @@ export RK_POST_OVERLAY="overlay-luckfox-config overlay-luckfox-buildroot-init ov
 
 # ADS1299 MyBoard integration
 export RK_KERNEL_DEFCONFIG_FRAGMENT="$RK_KERNEL_DEFCONFIG_FRAGMENT ads1299-myboard.config"
+export RK_KERNEL_DEFCONFIG_FRAGMENT="$RK_KERNEL_DEFCONFIG_FRAGMENT pcm5102a-myboard.config"

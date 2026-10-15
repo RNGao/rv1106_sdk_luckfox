@@ -4,6 +4,26 @@
 / {
 	model = "Luckfox Pico Zero MyBoard (ADS1299)";
 
+	pcm5102a: pcm5102a {
+		compatible = "ti,pcm5102a";
+		#sound-dai-cells = <0>;
+	};
+
+	pcm5102a_sound: pcm5102a-sound {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "pcm5102a";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,mclk-fs = <256>;
+		simple-audio-card,bitclock-master = <&pcm5102a_cpu>;
+		simple-audio-card,frame-master = <&pcm5102a_cpu>;
+		pcm5102a_cpu: simple-audio-card,cpu {
+			sound-dai = <&i2s0_8ch>;
+		};
+		simple-audio-card,codec {
+			sound-dai = <&pcm5102a>;
+		};
+	};
+
 	gpio-keys {
 		compatible = "gpio-keys";
 		pinctrl-names = "default";
@@ -36,6 +56,26 @@
 &vdd_arm {
 	regulator-min-microvolt = <900000>;
 	regulator-max-microvolt = <900000>;
+};
+
+/* GPIO2_A0/A1/A2/A4 are shared with the SD card's SDMMC1 M0 pins. */
+&sdio {
+	status = "disabled";
+};
+
+&acodec_sound {
+	status = "disabled";
+};
+
+&acodec {
+	status = "disabled";
+};
+
+&i2s0_8ch {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pcm5102a_i2s0_pins>;
+	rockchip,playback-only;
+	status = "okay";
 };
 
 /* Keep automatic scaling within the board's existing 1.104 GHz ceiling. */
@@ -95,6 +135,15 @@
 };
 
 &pinctrl {
+	i2s0 {
+		pcm5102a_i2s0_pins: pcm5102a-i2s0-pins {
+			rockchip,pins = <2 RK_PA0 2 &pcfg_pull_none>, /* BCK */
+					<2 RK_PA1 2 &pcfg_pull_none>, /* LRCK */
+					<2 RK_PA2 2 &pcfg_pull_none>, /* SCK */
+					<2 RK_PA4 2 &pcfg_pull_none>; /* DIN */
+		};
+	};
+
 	keys {
 		keys_pins: keys-pins {
 			rockchip,pins = <1 RK_PC7 RK_FUNC_GPIO &pcfg_pull_up>,
