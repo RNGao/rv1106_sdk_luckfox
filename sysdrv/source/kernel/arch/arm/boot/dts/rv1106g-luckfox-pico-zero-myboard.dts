@@ -98,6 +98,26 @@
 	};
 };
 
+&pwm4 {
+	pinctrl-0 = <&pwm4m0_pins>;
+	status = "okay";
+};
+
+&pwm6 {
+	pinctrl-0 = <&pwm6m1_pins>;
+	status = "okay";
+};
+
+&pwm8 {
+	pinctrl-0 = <&pwm8m1_pins>;
+	status = "okay";
+};
+
+&pwm9 {
+	pinctrl-0 = <&pwm9m1_pins>;
+	status = "okay";
+};
+
 &spi0 {
 	status = "okay";
 	pinctrl-names = "default";
