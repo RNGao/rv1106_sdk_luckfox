@@ -1,0 +1,11 @@
+| 电源阈                                                | 对应供电引脚              | luckfox供电 | 自研板供电 |
+| ----------------------------------------------------- | ------------------------- | ----------- | ---------- |
+| EMMC/FSPI/UART/I2C/SPI                                | GPIO3_VCC                 | 3V3         | 3V3        |
+| SDMMC/UART/JTAG/PWM/I2C                               | GPIO4_VCC                 | 3V3         | 3V3        |
+| RTC                                                   | VCC3V3_RTC                | /           | 3V3        |
+| PMU/UART/PWM/I2C                                      | PMU_DVDD0V9               | 0V9         | 0V9        |
+| PMU/UART/PWM/I2C                                      | PMU_VCC3V3                | 3V3         | 3V3        |
+| VCCIO1/UART/I2C/PWM/JTAG                              | GPIO1_VCC3V3              | 3V3         | 3V3        |
+| SDIO/I2S/VO_LCDC/UART/PWM/I2C                         | GPIO5_VCC                 | 3V3         | 1V8        |
+| VO_LCDC/VI_CIF/PWM/UART/I2C/SDIO/SPI/AUD_DSM/VI_BT656 | GPIO6_VCC                 | 3V3         | 3V3        |
+| VI_CIF/MIPI_CSI/LVDS_RX/UART/I2C/VI_BT1120/VI_BT656   | MIPI_AVDD1V8/GPIO7_VCC1V8 | 1V8         | 1V8        |
