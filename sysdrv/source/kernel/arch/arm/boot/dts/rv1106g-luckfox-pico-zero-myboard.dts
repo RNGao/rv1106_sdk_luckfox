@@ -145,6 +145,15 @@
 		interrupt-parent = <&gpio1>;
 		interrupts = <RK_PC6 IRQ_TYPE_EDGE_FALLING>;
 	};
+
+	max17048: fuel-gauge@36 {
+		compatible = "maxim,max17048";
+		reg = <0x36>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&max17048_int>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <RK_PD3 IRQ_TYPE_EDGE_FALLING>;
+	};
 };
 
 &pinctrl {
@@ -193,6 +202,12 @@
 	icm20948 {
 		icm20948_int: icm20948-int {
 			rockchip,pins = <1 RK_PC6 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+	};
+
+	max17048 {
+		max17048_int: max17048-int {
+			rockchip,pins = <1 RK_PD3 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 };
