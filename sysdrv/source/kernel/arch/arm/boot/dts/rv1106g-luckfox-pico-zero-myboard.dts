@@ -89,11 +89,24 @@
 
 &leds {
 	pinctrl-names = "default";
-	pinctrl-0 = <&led_gpio0_a0>;
+	pinctrl-0 = <&led_red &led_green &led_blue>;
 
-	led-gpio0-a0 {
+	led-red {
 		label = "gpio0-a0";
-		gpios = <&gpio0 RK_PA0 GPIO_ACTIVE_HIGH>;
+		gpios = <&gpio0 RK_PA0 GPIO_ACTIVE_LOW>;
+		default-state = "off";
+	};
+
+	led-green {
+		label = "gpio0-a1";
+		gpios = <&gpio0 RK_PA1 GPIO_ACTIVE_LOW>;
+		linux,default-trigger = "activity";
+		default-state = "on";
+	};
+
+	led-blue {
+		label = "gpio1-c4";
+		gpios = <&gpio1 RK_PC4 GPIO_ACTIVE_LOW>;
 		default-state = "off";
 	};
 };
@@ -153,8 +166,16 @@
 	};
 
 	leds {
-		led_gpio0_a0: led-gpio0-a0 {
+		led_red: led-gpio0-a0 {
 			rockchip,pins = <0 RK_PA0 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		led_green: led-gpio0-a1 {
+			rockchip,pins = <0 RK_PA1 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		led_blue: led-gpio1-c4 {
+			rockchip,pins = <1 RK_PC4 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
